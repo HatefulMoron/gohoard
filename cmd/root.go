@@ -29,7 +29,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "gohoard",
 	Short: "gohoard is a super simple password manager",
-	Long: "gohoard is a super prescriptive simple password manager written in Go that utilizes GPG encryption.",
+	Long: "gohoard is a super simple prescriptive password manager written in Go that utilizes GPG encryption.",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
