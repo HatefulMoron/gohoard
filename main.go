@@ -15,7 +15,9 @@ limitations under the License.
 */
 package main
 
-import "github.com/elijahjpassmore/gohoard/cmd"
+import (
+	"github.com/elijahjpassmore/gohoard/cmd"
+)
 
 func main() {
 	cmd.Execute()
