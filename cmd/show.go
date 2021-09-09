@@ -28,7 +28,12 @@ var showCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, path := range args {
-			fmt.Println(getPassword(path))
+			password, err := getPassword(path)
+			if err == nil {
+				fmt.Println(password)
+			} else {
+				fmt.Println(err.Error())
+			}
 		}
 	},
 }

@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"github.com/atotto/clipboard"
 	"os"
@@ -32,7 +33,12 @@ var digCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
-		clipboard.WriteAll(getPassword(args[0]))
+		password, err := getPassword(args[0])
+		if err == nil {
+			clipboard.WriteAll(password)
+		} else {
+			fmt.Println(err.Error())
+		}
 	},
 }
 
@@ -41,18 +47,22 @@ func init() {
 }
 
 //getPassword get the password stored at the given path
-func getPassword(filePath string) string {
+func getPassword(filePath string) (string, error) {
 	// TODO: decrypt now encrypted file
 	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filePath)
 	fullPathEncrypted := fmt.Sprintf("%s/.gohoard/%s.gpg", os.Getenv("HOME"), filePath)
 
-	decryptFile(fullPathEncrypted)
+	err := decryptFile(fullPathEncrypted)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("missing password: %s", fullPathEncrypted))
+	}
+
 	password, _ := os.ReadFile(fullPath)
 	os.Remove(fullPath)
 
-	return string(password)
+	return string(password), nil
 }
-func decryptFile(filePath string) {
+func decryptFile(filePath string) error {
 	cmd := exec.Command("gpg", filePath)
-	_ = cmd.Run()
+	return cmd.Run()
 }

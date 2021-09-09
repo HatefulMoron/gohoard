@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/elijahjpassmore/gohoard/pkg"
@@ -54,23 +55,28 @@ func init() {
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
 }
 
-func stashPassword(password []byte, filePath string) {
+func stashPassword(password []byte, filePath string) error {
 	dir := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filepath.Dir(filePath))
 	file := filepath.Base(filePath)
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
-	_ = os.MkdirAll(dir, os.ModePerm)
+	err := os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return errors.New(fmt.Sprintf("cannot create directory: %s", dir))
+	}
 
 	// TODO: overwrite warning?
 	_ = os.WriteFile(fullPath, password, 0644)
 
-	err := clipboard.WriteAll(string(password))
+	err = clipboard.WriteAll(string(password))
 	if err != nil {
-		panic(err) // TODO: warning?
+		return errors.New("missing CLI clipboard")
 	}
 
 	encryptFile(fullPath)
 	os.Remove(fullPath)
+
+	return nil
 }
 
 func encryptFile(filePath string) {
