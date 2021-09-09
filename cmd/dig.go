@@ -31,7 +31,7 @@ var digCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
-		clipboard.WriteAll(digPassword(args[0]))
+		clipboard.WriteAll(getPassword(args[0]))
 	},
 }
 
@@ -39,7 +39,8 @@ func init() {
 	rootCmd.AddCommand(digCmd)
 }
 
-func digPassword(path string) string {
+//getPassword get the password stored at the given path
+func getPassword(path string) string {
 	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), path)
 	password, _ := os.ReadFile(fullPath)
 
