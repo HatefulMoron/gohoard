@@ -24,12 +24,11 @@ import (
 )
 
 type Config struct {
-	FilePath string
-	KeyId    string
+	FilePath  string
+	KeyId     string
 	HoardPath string
 }
 
-var cfgFile string
 var userConfig Config
 
 // rootCmd represents the base command when called without any subcommands
@@ -61,18 +60,21 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(userConfig.FilePath)
 		if err := viper.ReadInConfig(); err != nil {
-			fmt.Println("missing config")
+			fmt.Println(fmt.Sprintf("cannot find config at: %s", userConfig.FilePath))
+			os.Exit(1)
 		} else {
 			readConfig()
 		}
 	} else {
-		userConfig.FilePath = fmt.Sprintf("%s/.config/gohoard/gohoard.toml", home)
+		userConfig.FilePath = fmt.Sprintf("%s/.config/gohoard/gohoard.toml", home) // default config path
 		viper.SetConfigFile(userConfig.FilePath)
 		viper.AutomaticEnv() // read in environment variables that match
 
 		if err := viper.ReadInConfig(); err != nil {
-			os.Create(userConfig.FilePath) // create empty config file
-			viper.WriteConfig()
+			_, err := os.Create(userConfig.FilePath)
+			if err != nil {
+				fmt.Println(fmt.Sprintf("cannot write to file %s", userConfig.FilePath))
+			}
 			writeNewConfig()
 		} else {
 			readConfig()
@@ -84,7 +86,10 @@ func initConfig() {
 func readConfig() {
 	keyId := viper.Get("keyid")
 	if keyId == nil {
-		fmt.Println("no key specified in config file")
+		fmt.Println(fmt.Sprintf(`GPG key must be specified in %s
+
+E.g:
+	keyid: "YOUR_KEY_HERE"`, userConfig.FilePath))
 		os.Exit(1)
 	}
 	hoardPath := viper.Get("hoardpath")
@@ -95,9 +100,13 @@ func readConfig() {
 //writeNewConfig writes a new config file to userConfig.FilePath
 func writeNewConfig() {
 	// Get user input through terminal.
-	fmt.Print("gpg key ID (gpg --list-keys): ")
+	fmt.Print("GPG key ID (gpg --list-keys): ")
 	var keyId string
-	fmt.Scanln(&keyId)
+	_, err := fmt.Scanln(&keyId)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
 	// Create the user config.
 	userConfig.KeyId = keyId
@@ -106,9 +115,9 @@ func writeNewConfig() {
 	viper.Set("keyid", keyId)
 
 	// Write the new config.
-	err := viper.WriteConfig()
+	err = viper.WriteConfig()
 	if err != nil {
-		fmt.Println("test")
 		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 }
