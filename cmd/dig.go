@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/atotto/clipboard"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -43,7 +44,15 @@ func init() {
 func getPassword(filePath string) string {
 	// TODO: decrypt now encrypted file
 	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filePath)
+	fullPathEncrypted := fmt.Sprintf("%s/.gohoard/%s.gpg", os.Getenv("HOME"), filePath)
+
+	decryptFile(fullPathEncrypted)
 	password, _ := os.ReadFile(fullPath)
+	os.Remove(fullPath)
 
 	return string(password)
+}
+func decryptFile(filePath string) {
+	cmd := exec.Command("gpg", filePath)
+	_ = cmd.Run()
 }
