@@ -17,32 +17,31 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/atotto/clipboard"
+	"os"
 
 	"github.com/spf13/cobra"
 )
 
 // digCmd represents the dig command
 var digCmd = &cobra.Command{
-	Use:   "dig",
-	Short: "Copy a password from the password hoard",
-	Long: "Copy a password from the password hoard to the clipboard.",
-	Args: cobra.MinimumNArgs(1),
+	Use:        "dig",
+	Short:      "Copy a password from the password hoard",
+	Long:       "Copy a password from the password hoard to the clipboard.",
+	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("dig called")
+		clipboard.WriteAll(digPassword(args[0]))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(digCmd)
+}
 
-	// Here you will define your flags and configuration settings.
+func digPassword(path string) string {
+	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), path)
+	password, _ := os.ReadFile(fullPath)
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// digCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// digCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	return string(password)
 }
