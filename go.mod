@@ -3,6 +3,7 @@ module github.com/elijahjpassmore/gohoard
 go 1.17
 
 require (
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect

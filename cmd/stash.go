@@ -17,24 +17,29 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/elijahjpassmore/gohoard/pkg"
 	"github.com/spf13/cobra"
+	"path/filepath"
+	"os"
 )
 
 // stashCmd represents the stash command
 var stashCmd = &cobra.Command{
-	Use:   "stash",
-	Short: "Put a password in the password hoard",
-	Long:  "Put a password in the password hoard.",
-	Args: cobra.MinimumNArgs(1),
+	Use:        "stash",
+	Short:      "Put a password in the password hoard",
+	Long:       "Put a password in the password hoard.",
+	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"add", "new", "create"},
 	Run: func(cmd *cobra.Command, args []string) {
 		digits, _ := cmd.Flags().GetBool("no-digits")
 		symbols, _ := cmd.Flags().GetBool("no-symbols")
 		capitals, _ := cmd.Flags().GetBool("no-capitals")
 
-		password := pkg.NewPassword(20, !digits, !symbols, !capitals)
-		fmt.Println(password)
+		for _, path := range args {
+			password := pkg.NewPassword(20, !digits, !symbols, !capitals)
+			stashPassword([]byte(password), path)
+		}
 	},
 }
 
@@ -44,4 +49,20 @@ func init() {
 	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits from new password")
 	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols from new password")
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals from new password")
+}
+
+func stashPassword(password []byte, path string) {
+	dir := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filepath.Dir(path))
+	file := filepath.Base(path)
+
+	_ = os.MkdirAll(dir, os.ModePerm)
+	fullPath := fmt.Sprintf("%s/%s", dir, file)
+
+	// TODO: overwrite warning?
+	_ = os.WriteFile(fullPath, password, 0644)
+
+	err := clipboard.WriteAll(string(password))
+	if err != nil {
+		panic(err) // TODO: warning?
+	}
 }
