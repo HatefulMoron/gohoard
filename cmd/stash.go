@@ -20,8 +20,9 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/elijahjpassmore/gohoard/pkg"
 	"github.com/spf13/cobra"
-	"path/filepath"
 	"os"
+	"os/exec"
+	"path/filepath"
 )
 
 // stashCmd represents the stash command
@@ -53,12 +54,12 @@ func init() {
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
 }
 
-func stashPassword(password []byte, path string) {
-	dir := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filepath.Dir(path))
-	file := filepath.Base(path)
+func stashPassword(password []byte, filePath string) {
+	dir := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filepath.Dir(filePath))
+	file := filepath.Base(filePath)
+	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
 	_ = os.MkdirAll(dir, os.ModePerm)
-	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
 	// TODO: overwrite warning?
 	_ = os.WriteFile(fullPath, password, 0644)
@@ -67,4 +68,12 @@ func stashPassword(password []byte, path string) {
 	if err != nil {
 		panic(err) // TODO: warning?
 	}
+
+	encryptFile(fullPath)
+	os.Remove(fullPath)
+}
+
+func encryptFile(filePath string) {
+	cmd := exec.Command("gpg", "-r", getConfigField("KeyId"), "-e", filePath)
+	_ = cmd.Run()
 }

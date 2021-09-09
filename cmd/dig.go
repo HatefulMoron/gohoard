@@ -40,8 +40,9 @@ func init() {
 }
 
 //getPassword get the password stored at the given path
-func getPassword(path string) string {
-	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), path)
+func getPassword(filePath string) string {
+	// TODO: decrypt now encrypted file
+	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filePath)
 	password, _ := os.ReadFile(fullPath)
 
 	return string(password)
