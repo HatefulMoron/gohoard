@@ -38,6 +38,7 @@ var showCmd = &cobra.Command{
 	},
 }
 
+//init adds the new command to rootCmd
 func init() {
 	rootCmd.AddCommand(showCmd)
 }

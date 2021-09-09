@@ -25,7 +25,8 @@ import (
 
 type Config struct {
 	FilePath string
-	KeyId string
+	KeyId    string
+	HoardPath string
 }
 
 var cfgFile string
@@ -50,8 +51,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&userConfig.FilePath, "config", "", "config file (default is $HOME/.config/gohoard/gohoard.toml)")
 }
 
-// initConfig reads in config file and ENV variables if set.
+// initConfig reads in config file and ENV variables if set
 func initConfig() {
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	viper.SetDefault("hoardpath", fmt.Sprintf("%s/.gohoard/", home))
+
 	if userConfig.FilePath != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(userConfig.FilePath)
@@ -61,9 +66,6 @@ func initConfig() {
 			readConfig()
 		}
 	} else {
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
 		userConfig.FilePath = fmt.Sprintf("%s/.config/gohoard/gohoard.toml", home)
 		viper.SetConfigFile(userConfig.FilePath)
 		viper.AutomaticEnv() // read in environment variables that match
@@ -85,10 +87,12 @@ func readConfig() {
 		fmt.Println("no key specified in config file")
 		os.Exit(1)
 	}
+	hoardPath := viper.Get("hoardpath")
 	userConfig.KeyId = fmt.Sprintf("%s", keyId)
+	userConfig.HoardPath = fmt.Sprintf("%s", hoardPath)
 }
 
-//writeNewConfig writes a new config file according.
+//writeNewConfig writes a new config file to userConfig.FilePath
 func writeNewConfig() {
 	// Get user input through terminal.
 	fmt.Print("gpg key ID (gpg --list-keys): ")

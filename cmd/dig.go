@@ -42,14 +42,15 @@ var digCmd = &cobra.Command{
 	},
 }
 
+//init adds the new command to rootCmd
 func init() {
 	rootCmd.AddCommand(digCmd)
 }
 
 //getPassword get the password stored at the given path
 func getPassword(filePath string) (string, error) {
-	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filePath)
-	fullPathEncrypted := fmt.Sprintf("%s/.gohoard/%s.gpg", os.Getenv("HOME"), filePath)
+	fullPath := fmt.Sprintf("%s/%s", userConfig.HoardPath, filePath)
+	fullPathEncrypted := fmt.Sprintf("%s/%s.gpg", userConfig.HoardPath, filePath)
 
 	_, err := os.OpenFile(fullPathEncrypted, os.O_RDONLY, 0644)
 	if os.IsNotExist(err) {
@@ -66,6 +67,7 @@ func getPassword(filePath string) (string, error) {
 	return string(password), nil
 }
 
+//decryptFile decrypts a file and returns the result
 func decryptFile(filePath string) error {
 	cmd := exec.Command("gpg", filePath)
 	return cmd.Run()

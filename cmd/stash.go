@@ -46,6 +46,7 @@ var stashCmd = &cobra.Command{
 	},
 }
 
+//init adds the new command to rootCmd
 func init() {
 	rootCmd.AddCommand(stashCmd)
 
@@ -55,8 +56,9 @@ func init() {
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
 }
 
+//stashPassword stores a given password to a given file path
 func stashPassword(password []byte, filePath string) error {
-	dir := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filepath.Dir(filePath))
+	dir := fmt.Sprintf("%s/%s", userConfig.HoardPath, filepath.Dir(filePath))
 	file := filepath.Base(filePath)
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
@@ -76,6 +78,7 @@ func stashPassword(password []byte, filePath string) error {
 	return nil
 }
 
+//encryptFile encrypts a given file
 func encryptFile(filePath string) {
 	cmd := exec.Command("gpg", "-r", userConfig.KeyId, "-e", filePath)
 	cmd.Run()
