@@ -60,15 +60,12 @@ func stashPassword(password []byte, filePath string) error {
 	file := filepath.Base(filePath)
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
-	err := os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		return errors.New(fmt.Sprintf("cannot create directory: %s", dir))
-	}
+	_ = os.MkdirAll(dir, os.ModePerm)
 
 	// TODO: overwrite warning?
 	_ = os.WriteFile(fullPath, password, 0644)
 
-	err = clipboard.WriteAll(string(password))
+	err := clipboard.WriteAll(string(password))
 	if err != nil {
 		return errors.New("missing CLI clipboard")
 	}
