@@ -26,6 +26,8 @@ var digCmd = &cobra.Command{
 	Use:   "dig",
 	Short: "Copy a password from the password hoard",
 	Long: "Copy a password from the password hoard to the clipboard.",
+	Args: cobra.MinimumNArgs(1),
+	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("dig called")
 	},

@@ -26,8 +26,14 @@ var stashCmd = &cobra.Command{
 	Use:   "stash",
 	Short: "Put a password in the password hoard",
 	Long:  "Put a password in the password hoard.",
+	Args: cobra.MinimumNArgs(1),
+	SuggestFor: []string{"add", "new", "create"},
 	Run: func(cmd *cobra.Command, args []string) {
-		password := pkg.NewPassword(20, true, true, true)
+		digits, _ := cmd.Flags().GetBool("no-digits")
+		symbols, _ := cmd.Flags().GetBool("no-symbols")
+		capitals, _ := cmd.Flags().GetBool("no-capitals")
+
+		password := pkg.NewPassword(20, !digits, !symbols, !capitals)
 		fmt.Println(password)
 	},
 }
@@ -35,14 +41,7 @@ var stashCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(stashCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// stashCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// stashCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	stashCmd.Flags().BoolP("digits", "d", false, "Omit digits from new password")
+	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits from new password")
+	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols from new password")
+	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals from new password")
 }

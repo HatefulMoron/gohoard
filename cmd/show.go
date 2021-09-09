@@ -26,6 +26,7 @@ var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Print a password from the stash",
 	Long: "Print a password from the stash to the terminal.",
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("show called")
 	},
