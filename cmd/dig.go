@@ -24,8 +24,8 @@ import (
 // digCmd represents the dig command
 var digCmd = &cobra.Command{
 	Use:   "dig",
-	Short: "Get a password from the password hoard",
-	Long: "Get a password from the password hoard and copy it to the clipboard for use.",
+	Short: "Copy a password from the password hoard",
+	Long: "Copy a password from the password hoard to the clipboard.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("dig called")
 	},
