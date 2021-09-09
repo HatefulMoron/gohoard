@@ -48,13 +48,16 @@ func init() {
 
 //getPassword get the password stored at the given path
 func getPassword(filePath string) (string, error) {
-	// TODO: decrypt now encrypted file
 	fullPath := fmt.Sprintf("%s/.gohoard/%s", os.Getenv("HOME"), filePath)
 	fullPathEncrypted := fmt.Sprintf("%s/.gohoard/%s.gpg", os.Getenv("HOME"), filePath)
 
-	err := decryptFile(fullPathEncrypted)
+	_, err := os.OpenFile(fullPathEncrypted, os.O_RDONLY, 0644)
+	if os.IsNotExist(err) {
+		return "", err
+	}
+	err = decryptFile(fullPathEncrypted)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("missing password: %s", fullPathEncrypted))
+		return "", errors.New(fmt.Sprintf("cannot decrypt: %s", fullPathEncrypted))
 	}
 
 	password, _ := os.ReadFile(fullPath)
@@ -62,6 +65,7 @@ func getPassword(filePath string) (string, error) {
 
 	return string(password), nil
 }
+
 func decryptFile(filePath string) error {
 	cmd := exec.Command("gpg", filePath)
 	return cmd.Run()

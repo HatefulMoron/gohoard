@@ -60,10 +60,10 @@ func stashPassword(password []byte, filePath string) error {
 	file := filepath.Base(filePath)
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
-	_ = os.MkdirAll(dir, os.ModePerm)
+	os.MkdirAll(dir, os.ModePerm)
 
 	// TODO: overwrite warning?
-	_ = os.WriteFile(fullPath, password, 0644)
+	os.WriteFile(fullPath, password, 0644)
 
 	err := clipboard.WriteAll(string(password))
 	if err != nil {
@@ -77,6 +77,6 @@ func stashPassword(password []byte, filePath string) error {
 }
 
 func encryptFile(filePath string) {
-	cmd := exec.Command("gpg", "-r", getConfigField("KeyId"), "-e", filePath)
-	_ = cmd.Run()
+	cmd := exec.Command("gpg", "-r", userConfig.KeyId, "-e", filePath)
+	cmd.Run()
 }
