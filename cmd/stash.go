@@ -32,12 +32,13 @@ var stashCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"add", "new", "create"},
 	Run: func(cmd *cobra.Command, args []string) {
+		minLength, _ := cmd.Flags().GetInt("min-length")
 		digits, _ := cmd.Flags().GetBool("no-digits")
 		symbols, _ := cmd.Flags().GetBool("no-symbols")
 		capitals, _ := cmd.Flags().GetBool("no-capitals")
 
 		for _, path := range args {
-			password := pkg.NewPassword(20, !digits, !symbols, !capitals)
+			password := pkg.NewPassword(minLength, !digits, !symbols, !capitals)
 			stashPassword([]byte(password), path)
 		}
 	},
@@ -46,9 +47,10 @@ var stashCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(stashCmd)
 
-	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits from new password")
-	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols from new password")
-	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals from new password")
+	stashCmd.Flags().IntP("min-length", "l", 20, "minimum password length")
+	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits")
+	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols")
+	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
 }
 
 func stashPassword(password []byte, path string) {
