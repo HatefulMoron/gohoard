@@ -21,13 +21,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version = "0.1.0"
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "The current version of gohoard",
-	Long: "The current version of gohoard.",
+	Long:  "The current version of gohoard.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("version called")
+		fmt.Println("gohoard v" + version)
 	},
 }
 

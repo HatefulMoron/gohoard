@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-
+	"github.com/elijahjpassmore/gohoard/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -25,9 +25,10 @@ import (
 var stashCmd = &cobra.Command{
 	Use:   "stash",
 	Short: "Put a password in the password hoard",
-	Long: "Put a password in the password hoard.",
+	Long:  "Put a password in the password hoard.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("stash called")
+		password := pkg.NewPassword(20, true, true, true)
+		fmt.Println(password)
 	},
 }
 
@@ -43,4 +44,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// stashCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	stashCmd.Flags().BoolP("digits", "d", false, "Omit digits from new password")
 }
