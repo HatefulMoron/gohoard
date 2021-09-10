@@ -81,7 +81,7 @@ func stashPassword(password []byte, hoardPath string) error {
 	}
 	// TODO: overwrite
 	if fileExists(fullPath + ".gpg") {
-		return errors.New("password already exists in hoard")
+		return errors.New(fmt.Sprintf("%s already exists in hoard", hoardPath))
 	}
 	err = os.WriteFile(fullPath, password, 0644)
 	if err != nil {

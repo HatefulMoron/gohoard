@@ -62,7 +62,7 @@ func getPassword(filePath string, hoardPath string) (string, error) {
 	encryptedPath := fmt.Sprintf("%s%s.gpg", hoardPath, filePath)
 
 	if !fileExists(encryptedPath) {
-		return "", errors.New("password does not exist in hoard")
+		return "", errors.New(fmt.Sprintf("%s does not exist in hoard", filePath))
 	}
 
 	// See if the user is able to decrypt the file.
