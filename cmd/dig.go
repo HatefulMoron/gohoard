@@ -43,7 +43,7 @@ var digCmd = &cobra.Command{
 			}
 			err = clipboard.WriteAll(password)
 			if err != nil {
-				println("missing CLI clipboard (e.g xclip)")
+				println("missing CLI clipboard (e.g. xclip)")
 			}
 		} else {
 			fmt.Println(err.Error())
@@ -73,7 +73,6 @@ func getPassword(filePath string) (string, error) {
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("failed to decrypt: %s, check key ID", encryptedPath))
 	}
-
 	password, _ := os.ReadFile(decryptedPath)
 	err = os.Remove(decryptedPath)
 	if err != nil {

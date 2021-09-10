@@ -74,21 +74,25 @@ func initConfig() {
 		viper.AutomaticEnv() // read in environment variables that match
 
 		if err := viper.ReadInConfig(); err != nil {
+			// Create an empty config file.
 			_, err := os.Create(userConfig.FilePath)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("cannot write to file: %s", userConfig.FilePath))
 			}
+			// Write the new config.
 			err = writeNewConfig()
 			if err != nil {
 				println(err.Error())
 				os.Exit(1)
 			}
+			// Read the config contents.
 			err = readConfig()
 			if err != nil {
 				println(err.Error())
 				os.Exit(1)
 			}
 		} else {
+			// Read the config contents.
 			err = readConfig()
 			if err != nil {
 				println(err.Error())
@@ -125,7 +129,6 @@ func writeNewConfig() error {
 			break
 		}
 	}
-
 	// Get the gohoard directory.
 	fmt.Print("gohoard directory [$HOME/.gohoard/]: ")
 	var hoardPath string
@@ -135,13 +138,11 @@ func writeNewConfig() error {
 
 	// Create the user config.
 	userConfig.KeyId = keyId
-
 	// Set the variables.
 	viper.Set("keyid", keyId)
 	if hoardPath != "" {
 		viper.Set("hoardpath", hoardPath)
 	}
-
 	// Write the new config.
 	err = viper.WriteConfig()
 	if err != nil {
