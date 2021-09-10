@@ -46,8 +46,11 @@ var stashCmd = &cobra.Command{
 			if verbose {
 				fmt.Println(fmt.Sprintf("stash password path: %s", path))
 			}
-			password := pkg.NewPassword(minLength, !digits, !symbols, !capitals)
-			err := stashPassword([]byte(password), path)
+			password, err := pkg.NewPassword(minLength, !digits, !symbols, !capitals)
+			if err != nil {
+				println(err.Error())
+			}
+			err = stashPassword([]byte(password), path)
 			if err != nil {
 				println(err.Error())
 			}

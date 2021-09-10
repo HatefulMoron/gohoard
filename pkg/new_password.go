@@ -17,6 +17,7 @@ limitations under the License.
 package pkg
 
 import (
+	"errors"
 	"github.com/sethvargo/go-diceware/diceware"
 	"math/rand"
 	"strings"
@@ -26,8 +27,8 @@ import (
 var digits = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 var symbols = []string{"!", "(", ")", "-", ".", "?", "[", "]", "_", "`", "~", ";", ":", "@", "#", "$", "%", "^", "&", "*", "+", "="}
 
-//NewPassword generate a new prescriptive password
-func NewPassword(length int, isDigits bool, isSymbols bool, isCapitalize bool) string {
+//NewPassword generates a new prescriptive password
+func NewPassword(length int, isDigits bool, isSymbols bool, isCapitalize bool) (string, error) {
 	rand.Seed(time.Now().UnixNano())
 	var sb strings.Builder
 
@@ -42,7 +43,7 @@ func NewPassword(length int, isDigits bool, isSymbols bool, isCapitalize bool) s
 	for sb.Len() < length {
 		newWord, err := diceware.Generate(1)
 		if err != nil {
-			panic(err)
+			return "", errors.New("unable to generate valid word")
 		}
 
 		if isCapitalize {
@@ -54,5 +55,5 @@ func NewPassword(length int, isDigits bool, isSymbols bool, isCapitalize bool) s
 	}
 
 	newString := sb.String()
-	return newString[:len(newString)-1]
+	return newString[:len(newString)-1], nil
 }
