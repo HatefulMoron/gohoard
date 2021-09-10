@@ -34,8 +34,13 @@ var digCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
+		verbose, _ := cmd.Flags().GetBool("verbose")
+
 		password, err := getPassword(args[0])
 		if err == nil {
+			if verbose {
+				fmt.Println(fmt.Sprintf("%s copied to clipboard", args[0]))
+			}
 			clipboard.WriteAll(password)
 		} else {
 			fmt.Println(err.Error())

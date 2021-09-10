@@ -49,6 +49,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&userConfig.FilePath, "config", "", "config file (default is $HOME/.config/gohoard/gohoard.toml)")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "make the operation more talkative")
 }
 
 // initConfig reads in config file and ENV variables if set

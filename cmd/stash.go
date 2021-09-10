@@ -35,12 +35,17 @@ var stashCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"add", "new", "create"},
 	Run: func(cmd *cobra.Command, args []string) {
+		verbose, _ := cmd.Flags().GetBool("verbose")
+
 		minLength, _ := cmd.Flags().GetInt("min-length")
 		digits, _ := cmd.Flags().GetBool("no-digits")
 		symbols, _ := cmd.Flags().GetBool("no-symbols")
 		capitals, _ := cmd.Flags().GetBool("no-capitals")
 
 		for _, path := range args {
+			if verbose {
+				fmt.Println(fmt.Sprintf("Stashing password path: %s", path))
+			}
 			password := pkg.NewPassword(minLength, !digits, !symbols, !capitals)
 			stashPassword([]byte(password), path)
 		}

@@ -29,7 +29,12 @@ var showCmd = &cobra.Command{
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"print"},
 	Run: func(cmd *cobra.Command, args []string) {
+		verbose, _ := cmd.Flags().GetBool("verbose")
+
 		for _, path := range args {
+			if verbose {
+				fmt.Println(fmt.Sprintf("Showing password path: %s", path))
+			}
 			password, err := getPassword(path)
 			if err == nil {
 				fmt.Println(password)
