@@ -31,7 +31,7 @@ var digCmd = &cobra.Command{
 	Use:        "dig",
 	Short:      "Copy a password from the password hoard",
 	Long:       "Copy a password from the password hoard to the clipboard.",
-	Args:       cobra.MinimumNArgs(1),
+	Args:       cobra.ExactArgs(1),
 	SuggestFor: []string{"copy", "get"},
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose, _ := cmd.Flags().GetBool("verbose")
@@ -59,7 +59,7 @@ func init() {
 //getPassword get the password stored at the given path
 func getPassword(filePath string, hoardPath string) (string, error) {
 	decryptedPath := fmt.Sprintf("%s%s", hoardPath, filePath)
-	encryptedPath := fmt.Sprintf("%s%s.gpg", hoardPath, filePath)
+	encryptedPath := fmt.Sprintf("%s.gpg", decryptedPath)
 
 	if !fileExists(encryptedPath) {
 		return "", errors.New(fmt.Sprintf("%s does not exist in hoard", filePath))

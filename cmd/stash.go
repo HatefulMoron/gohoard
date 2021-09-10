@@ -38,6 +38,7 @@ var stashCmd = &cobra.Command{
 		verbose, _ := cmd.Flags().GetBool("verbose")
 
 		minLength, _ := cmd.Flags().GetInt("min-length")
+		overwrite, _ := cmd.Flags().GetBool("overwrite")
 		digits, _ := cmd.Flags().GetBool("no-digits")
 		symbols, _ := cmd.Flags().GetBool("no-symbols")
 		capitals, _ := cmd.Flags().GetBool("no-capitals")
@@ -50,7 +51,7 @@ var stashCmd = &cobra.Command{
 			if err != nil {
 				println(err.Error())
 			}
-			err = stashPassword([]byte(password), path)
+			err = stashPassword([]byte(password), path, overwrite)
 			if err != nil {
 				println(err.Error())
 			}
@@ -63,27 +64,37 @@ func init() {
 	rootCmd.AddCommand(stashCmd)
 
 	stashCmd.Flags().IntP("min-length", "l", 30, "minimum password length")
+	stashCmd.Flags().BoolP("overwrite", "o", false, "overwrite existing passwords")
 	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits")
 	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols")
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
 }
 
 //stashPassword stores a given password to a given file path
-func stashPassword(password []byte, hoardPath string) error {
+func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	dir := fmt.Sprintf("%s%s", userConfig.HoardPath, filepath.Dir(hoardPath))
 	file := filepath.Base(hoardPath) // file name without dir
-	fullPath := fmt.Sprintf("%s/%s", dir, file)
+	decryptedPath := fmt.Sprintf("%s/%s", dir, file)
+	encryptedPath := fmt.Sprintf("%s.gpg", decryptedPath)
 
 	// Create directories and file.
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	// TODO: overwrite
-	if fileExists(fullPath + ".gpg") {
-		return errors.New(fmt.Sprintf("%s already exists in hoard", hoardPath))
+	// Either return if the password already exists, or overwrite it.
+	isExisting := fileExists(encryptedPath)
+	if isExisting {
+		if overwrite {
+			err = os.Remove(encryptedPath)
+			if err != nil {
+				return err
+			}
+		} else {
+			return errors.New(fmt.Sprintf("%s already exists in hoard", hoardPath))
+		}
 	}
-	err = os.WriteFile(fullPath, password, 0644)
+	err = os.WriteFile(decryptedPath, password, 0644)
 	if err != nil {
 		return err
 	}
@@ -95,11 +106,11 @@ func stashPassword(password []byte, hoardPath string) error {
 	}
 
 	// Encrypt the file.
-	err = encryptFile(fullPath)
+	err = encryptFile(decryptedPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to encrypt: %s", fullPath))
+		return errors.New(fmt.Sprintf("failed to encrypt: %s", decryptedPath))
 	}
-	err = os.Remove(fullPath)
+	err = os.Remove(decryptedPath)
 	if err != nil {
 		return err
 	}
