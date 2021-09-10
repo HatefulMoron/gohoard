@@ -25,8 +25,8 @@ var version = "0.1.0"
 var license = "Apache License, Version 2.0"
 var repository = "https://github.com/elijahjpassmore/gohoard"
 
-// versionCmd represents the version command
-var versionCmd = &cobra.Command{
+// aboutCmd represents the about command
+var aboutCmd = &cobra.Command{
 	Use:   "about",
 	Short: "Print information about gohoard",
 	Long:  "Print information about the installed version of gohoard.",
@@ -40,5 +40,5 @@ Read more about the project and report issues at %s`, version, license, reposito
 
 //init adds the new command to rootCmd
 func init() {
-	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(aboutCmd)
 }
