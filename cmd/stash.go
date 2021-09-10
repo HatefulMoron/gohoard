@@ -76,6 +76,7 @@ func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	file := filepath.Base(hoardPath) // file name without dir
 	decryptedPath := fmt.Sprintf("%s/%s", dir, file)
 	encryptedPath := fmt.Sprintf("%s.gpg", decryptedPath)
+	tempEncryptedPath := fmt.Sprintf("%s.temp", encryptedPath)
 
 	// Create directories and file.
 	err := os.MkdirAll(dir, os.ModePerm)
@@ -86,7 +87,8 @@ func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	isExisting := fileExists(encryptedPath)
 	if isExisting {
 		if overwrite {
-			err = os.Remove(encryptedPath)
+			// Move the existing file to a temporary location.
+			err = os.Rename(encryptedPath, tempEncryptedPath)
 			if err != nil {
 				return err
 			}
@@ -110,6 +112,12 @@ func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	if err != nil {
 		// If the file is unable to be encrypted, delete it.
 		err = os.Remove(decryptedPath)
+		if overwrite {
+			err = os.Rename(tempEncryptedPath, encryptedPath)
+			if err != nil {
+				return err
+			}
+		}
 		if err != nil {
 			return err
 		}
@@ -119,6 +127,12 @@ func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	err = os.Remove(decryptedPath)
 	if err != nil {
 		return err
+	}
+	if overwrite {
+		err = os.Remove(tempEncryptedPath)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
