@@ -36,7 +36,7 @@ var digCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose, _ := cmd.Flags().GetBool("verbose")
 
-		password, err := getPassword(args[0])
+		password, err := getPassword(args[0], userConfig.HoardPath)
 		if err == nil {
 			if verbose {
 				fmt.Println(fmt.Sprintf("%s copied to clipboard", args[0]))
@@ -57,26 +57,23 @@ func init() {
 }
 
 //getPassword get the password stored at the given path
-func getPassword(filePath string) (string, error) {
-	decryptedPath := fmt.Sprintf("%s%s", userConfig.HoardPath, filePath)
-	encryptedPath := fmt.Sprintf("%s%s.gpg", userConfig.HoardPath, filePath)
+func getPassword(filePath string, hoardPath string) (string, error) {
+	decryptedPath := fmt.Sprintf("%s%s", hoardPath, filePath)
+	encryptedPath := fmt.Sprintf("%s%s.gpg", hoardPath, filePath)
 
-	// Check if the file currently exists.
-	_, err := os.OpenFile(encryptedPath, os.O_RDONLY, 0644)
-	if os.IsNotExist(err) {
-		fmt.Println("test")
-		return "", err
+	if !fileExists(encryptedPath) {
+		return "", errors.New("password does not exist in hoard")
 	}
 
 	// See if the user is able to decrypt the file.
-	err = decryptFile(encryptedPath)
+	err := decryptFile(encryptedPath)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("failed to decrypt: %s, check key ID", encryptedPath))
+		return "", errors.New(fmt.Sprintf("failed to decrypt: %s", encryptedPath))
 	}
 	password, _ := os.ReadFile(decryptedPath)
 	err = os.Remove(decryptedPath)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("cannot remove file: %s", decryptedPath))
+		return "", err
 	}
 
 	return string(password), nil
@@ -85,5 +82,16 @@ func getPassword(filePath string) (string, error) {
 //decryptFile decrypts a file and returns the result
 func decryptFile(filePath string) error {
 	cmd := exec.Command("gpg", filePath)
+
 	return cmd.Run()
+}
+
+//fileExists checks if a file already exists at the given path
+func fileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	return true
 }

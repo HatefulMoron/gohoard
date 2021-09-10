@@ -77,11 +77,15 @@ func stashPassword(password []byte, hoardPath string) error {
 	// Create directories and file.
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		return errors.New(fmt.Sprintf("cannot make directory: %s", dir))
+		return err
+	}
+	// TODO: overwrite
+	if fileExists(fullPath + ".gpg") {
+		return errors.New("password already exists in hoard")
 	}
 	err = os.WriteFile(fullPath, password, 0644)
 	if err != nil {
-		return errors.New(fmt.Sprintf("cannot write file: %s", fullPath))
+		return err
 	}
 
 	// Copy the password to the clipboard.
@@ -93,11 +97,11 @@ func stashPassword(password []byte, hoardPath string) error {
 	// Encrypt the file.
 	err = encryptFile(fullPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to encrypt: %s, check key ID", fullPath))
+		return errors.New(fmt.Sprintf("failed to encrypt: %s", fullPath))
 	}
 	err = os.Remove(fullPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("cannot remove file: %s", fullPath))
+		return err
 	}
 
 	return nil
@@ -106,5 +110,6 @@ func stashPassword(password []byte, hoardPath string) error {
 //encryptFile encrypts a given file
 func encryptFile(filePath string) error {
 	cmd := exec.Command("gpg", "-r", userConfig.KeyId, "-e", filePath)
+
 	return cmd.Run()
 }

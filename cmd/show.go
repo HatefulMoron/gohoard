@@ -35,7 +35,7 @@ var showCmd = &cobra.Command{
 			if verbose {
 				fmt.Println(fmt.Sprintf("show password path: %s", path))
 			}
-			password, err := getPassword(path)
+			password, err := getPassword(path, userConfig.HoardPath)
 			if err == nil {
 				fmt.Println(password)
 			} else {
