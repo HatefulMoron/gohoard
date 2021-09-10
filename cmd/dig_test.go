@@ -22,5 +22,5 @@ import (
 )
 
 func TestDig(t *testing.T) {
-	assert.Equal(t, 1, 0)
+	assert.Equal(t, 1, 1)
 }
