@@ -44,10 +44,13 @@ var stashCmd = &cobra.Command{
 
 		for _, path := range args {
 			if verbose {
-				fmt.Println(fmt.Sprintf("Stashing password path: %s", path))
+				fmt.Println(fmt.Sprintf("stash password path: %s", path))
 			}
 			password := pkg.NewPassword(minLength, !digits, !symbols, !capitals)
-			stashPassword([]byte(password), path)
+			err := stashPassword([]byte(password), path)
+			if err != nil {
+				println(err.Error())
+			}
 		}
 	},
 }
@@ -68,23 +71,37 @@ func stashPassword(password []byte, hoardPath string) error {
 	file := filepath.Base(hoardPath) // file name without dir
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
-	os.MkdirAll(dir, os.ModePerm)
-	os.WriteFile(fullPath, password, 0644)
-
-	// Copy the password to the clipboard.
-	err := clipboard.WriteAll(string(password))
+	// Create directories and file.
+	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		return errors.New("missing CLI clipboard")
+		return errors.New(fmt.Sprintf("cannot make directory: %s", dir))
+	}
+	err = os.WriteFile(fullPath, password, 0644)
+	if err != nil {
+		return errors.New(fmt.Sprintf("cannot write file: %s", fullPath))
 	}
 
-	encryptFile(fullPath)
-	os.Remove(fullPath)
+	// Copy the password to the clipboard.
+	err = clipboard.WriteAll(string(password))
+	if err != nil {
+		return errors.New("missing CLI clipboard (e.g xclip)")
+	}
+
+	// Encrypt the file.
+	err = encryptFile(fullPath)
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to encrypt: %s, check key ID", fullPath))
+	}
+	err = os.Remove(fullPath)
+	if err != nil {
+		return errors.New(fmt.Sprintf("cannot remove file: %s", fullPath))
+	}
 
 	return nil
 }
 
 //encryptFile encrypts a given file
-func encryptFile(filePath string) {
+func encryptFile(filePath string) error {
 	cmd := exec.Command("gpg", "-r", userConfig.KeyId, "-e", filePath)
-	cmd.Run()
+	return cmd.Run()
 }

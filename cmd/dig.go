@@ -41,7 +41,10 @@ var digCmd = &cobra.Command{
 			if verbose {
 				fmt.Println(fmt.Sprintf("%s copied to clipboard", args[0]))
 			}
-			clipboard.WriteAll(password)
+			err = clipboard.WriteAll(password)
+			if err != nil {
+				println("missing CLI clipboard (e.g xclip)")
+			}
 		} else {
 			fmt.Println(err.Error())
 		}
@@ -61,17 +64,21 @@ func getPassword(filePath string) (string, error) {
 	// Check if the file currently exists.
 	_, err := os.OpenFile(encryptedPath, os.O_RDONLY, 0644)
 	if os.IsNotExist(err) {
+		fmt.Println("test")
 		return "", err
 	}
 
 	// See if the user is able to decrypt the file.
 	err = decryptFile(encryptedPath)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("cannot decrypt: %s", encryptedPath))
+		return "", errors.New(fmt.Sprintf("failed to decrypt: %s, check key ID", encryptedPath))
 	}
 
 	password, _ := os.ReadFile(decryptedPath)
-	os.Remove(decryptedPath)
+	err = os.Remove(decryptedPath)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("cannot remove file: %s", decryptedPath))
+	}
 
 	return string(password), nil
 }

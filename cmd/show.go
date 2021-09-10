@@ -33,7 +33,7 @@ var showCmd = &cobra.Command{
 
 		for _, path := range args {
 			if verbose {
-				fmt.Println(fmt.Sprintf("Showing password path: %s", path))
+				fmt.Println(fmt.Sprintf("show password path: %s", path))
 			}
 			password, err := getPassword(path)
 			if err == nil {

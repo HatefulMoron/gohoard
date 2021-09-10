@@ -17,11 +17,11 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"os"
-
 	"github.com/spf13/viper"
+	"os"
 )
 
 type Config struct {
@@ -78,44 +78,58 @@ func initConfig() {
 			if err != nil {
 				fmt.Println(fmt.Sprintf("cannot write to file: %s", userConfig.FilePath))
 			}
-			writeNewConfig()
-			readConfig()
+			err = writeNewConfig()
+			if err != nil {
+				println(err.Error())
+				os.Exit(1)
+			}
+			err = readConfig()
+			if err != nil {
+				println(err.Error())
+				os.Exit(1)
+			}
 		} else {
-			readConfig()
+			err = readConfig()
+			if err != nil {
+				println(err.Error())
+				os.Exit(1)
+			}
 		}
 	}
 }
 
 //readConfig reads config keys to an instance of Config
-func readConfig() {
+func readConfig() error {
 	keyId := viper.Get("keyid")
 	if keyId == nil {
-		fmt.Println(fmt.Sprintf(`GPG key must be specified in %s
+		return errors.New(fmt.Sprintf(`GPG key must be specified in %s
 
 E.g:
 	keyid: "YOUR_KEY_HERE"`, userConfig.FilePath))
-		os.Exit(1)
 	}
 	hoardPath := viper.Get("hoardpath")
 	userConfig.KeyId = fmt.Sprintf("%s", keyId)
 	userConfig.HoardPath = fmt.Sprintf("%s", hoardPath)
+
+	return nil
 }
 
 //writeNewConfig writes a new config file to userConfig.FilePath
-func writeNewConfig() {
+func writeNewConfig() error {
 	// Get the GPG key ID.
-	fmt.Print("GPG key ID (gpg --list-keys): ")
 	var keyId string
-	_, err := fmt.Scanln(&keyId)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	for {
+		fmt.Print("GPG key ID (gpg --list-keys): ")
+		_, err := fmt.Scanln(&keyId)
+		if err == nil {
+			break
+		}
 	}
 
 	// Get the gohoard directory.
 	fmt.Print("gohoard directory [$HOME/.gohoard/]: ")
 	var hoardPath string
-	_, err = fmt.Scanln(&hoardPath)
+	_, err := fmt.Scanln(&hoardPath)
 	if err == nil {
 	}
 
@@ -131,7 +145,8 @@ func writeNewConfig() {
 	// Write the new config.
 	err = viper.WriteConfig()
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
