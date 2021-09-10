@@ -28,9 +28,9 @@ var repository = "https://github.com/elijahjpassmore/gohoard"
 
 // aboutCmd represents the about command
 var aboutCmd = &cobra.Command{
-	Use:   "about",
-	Short: "Print information about gohoard",
-	Long:  "Print information about the installed version of gohoard.",
+	Use:        "about",
+	Short:      "Print information about gohoard",
+	Long:       "Print information about the installed version of gohoard.",
 	SuggestFor: []string{"version", "license", "repository"},
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(fmt.Sprintf(

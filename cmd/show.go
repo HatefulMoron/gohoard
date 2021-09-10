@@ -23,10 +23,10 @@ import (
 
 // showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Print a password from the stash",
-	Long:  "Print a password from the stash to the terminal.",
-	Args:  cobra.MinimumNArgs(1),
+	Use:        "show",
+	Short:      "Print a password from the stash",
+	Long:       "Print a password from the stash to the terminal.",
+	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"print"},
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, path := range args {

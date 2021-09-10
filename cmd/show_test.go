@@ -17,8 +17,8 @@ limitations under the License.
 package cmd
 
 import (
-"github.com/stretchr/testify/assert"
-"testing"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestShow(t *testing.T) {
