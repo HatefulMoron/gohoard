@@ -58,7 +58,7 @@ func initConfig() {
 	viper.SetDefault("hoardpath", fmt.Sprintf("%s/.gohoard/", home))
 
 	if userConfig.FilePath != "" {
-		// Use config file from the flag.
+		// If the user provides their own config path, use config file from the flag.
 		viper.SetConfigFile(userConfig.FilePath)
 		if err := viper.ReadInConfig(); err != nil {
 			fmt.Println(fmt.Sprintf("cannot find config at: %s", userConfig.FilePath))
@@ -67,6 +67,7 @@ func initConfig() {
 			readConfig()
 		}
 	} else {
+		// If the user does not provide their own config path, try and read the default.
 		userConfig.FilePath = fmt.Sprintf("%s/.config/gohoard/gohoard.toml", home) // default config path
 		viper.SetConfigFile(userConfig.FilePath)
 		viper.AutomaticEnv() // read in environment variables that match
@@ -101,7 +102,7 @@ E.g:
 
 //writeNewConfig writes a new config file to userConfig.FilePath
 func writeNewConfig() {
-	// Get user input through terminal.
+	// Get the GPG key ID.
 	fmt.Print("GPG key ID (gpg --list-keys): ")
 	var keyId string
 	_, err := fmt.Scanln(&keyId)
@@ -110,10 +111,12 @@ func writeNewConfig() {
 		os.Exit(1)
 	}
 
+	// Get the gohoard directory.
 	fmt.Print("gohoard directory [$HOME/.gohoard/]: ")
 	var hoardPath string
 	_, err = fmt.Scanln(&hoardPath)
-	if err == nil { }
+	if err == nil {
+	}
 
 	// Create the user config.
 	userConfig.KeyId = keyId

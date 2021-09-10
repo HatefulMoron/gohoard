@@ -58,16 +58,15 @@ func init() {
 }
 
 //stashPassword stores a given password to a given file path
-func stashPassword(password []byte, filePath string) error {
-	dir := fmt.Sprintf("%s/%s", userConfig.HoardPath, filepath.Dir(filePath))
-	file := filepath.Base(filePath)
+func stashPassword(password []byte, hoardPath string) error {
+	dir := fmt.Sprintf("%s%s", userConfig.HoardPath, filepath.Dir(hoardPath))
+	file := filepath.Base(hoardPath) // file name without dir
 	fullPath := fmt.Sprintf("%s/%s", dir, file)
 
 	os.MkdirAll(dir, os.ModePerm)
-
-	// TODO: overwrite warning?
 	os.WriteFile(fullPath, password, 0644)
 
+	// Copy the password to the clipboard.
 	err := clipboard.WriteAll(string(password))
 	if err != nil {
 		return errors.New("missing CLI clipboard")

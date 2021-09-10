@@ -53,10 +53,13 @@ func getPassword(filePath string) (string, error) {
 	decryptedPath := fmt.Sprintf("%s%s", userConfig.HoardPath, filePath)
 	encryptedPath := fmt.Sprintf("%s%s.gpg", userConfig.HoardPath, filePath)
 
+	// Check if the file currently exists.
 	_, err := os.OpenFile(encryptedPath, os.O_RDONLY, 0644)
 	if os.IsNotExist(err) {
 		return "", err
 	}
+
+	// See if the user is able to decrypt the file.
 	err = decryptFile(encryptedPath)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("cannot decrypt: %s", encryptedPath))
