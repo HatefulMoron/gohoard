@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package cmd
 
 import (
@@ -49,20 +50,20 @@ func init() {
 
 //getPassword get the password stored at the given path
 func getPassword(filePath string) (string, error) {
-	fullPath := fmt.Sprintf("%s/%s", userConfig.HoardPath, filePath)
-	fullPathEncrypted := fmt.Sprintf("%s/%s.gpg", userConfig.HoardPath, filePath)
+	decryptedPath := fmt.Sprintf("%s%s", userConfig.HoardPath, filePath)
+	encryptedPath := fmt.Sprintf("%s%s.gpg", userConfig.HoardPath, filePath)
 
-	_, err := os.OpenFile(fullPathEncrypted, os.O_RDONLY, 0644)
+	_, err := os.OpenFile(encryptedPath, os.O_RDONLY, 0644)
 	if os.IsNotExist(err) {
 		return "", err
 	}
-	err = decryptFile(fullPathEncrypted)
+	err = decryptFile(encryptedPath)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("cannot decrypt: %s", fullPathEncrypted))
+		return "", errors.New(fmt.Sprintf("cannot decrypt: %s", encryptedPath))
 	}
 
-	password, _ := os.ReadFile(fullPath)
-	os.Remove(fullPath)
+	password, _ := os.ReadFile(decryptedPath)
+	os.Remove(encryptedPath)
 
 	return string(password), nil
 }
