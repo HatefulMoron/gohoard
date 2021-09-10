@@ -26,6 +26,7 @@ var showCmd = &cobra.Command{
 	Short: "Print a password from the stash",
 	Long:  "Print a password from the stash to the terminal.",
 	Args:  cobra.MinimumNArgs(1),
+	SuggestFor: []string{"print"},
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, path := range args {
 			password, err := getPassword(path)

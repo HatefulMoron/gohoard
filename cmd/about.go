@@ -22,14 +22,19 @@ import (
 )
 
 var version = "0.1.0"
+var license = "Apache License, Version 2.0"
+var repository = "https://github.com/elijahjpassmore/gohoard"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "The current version of gohoard",
-	Long:  "The current version of gohoard.",
+	Use:   "about",
+	Short: "Print information about gohoard",
+	Long:  "Print information about the installed version of gohoard.",
+	SuggestFor: []string{"version", "license", "repository"},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gohoard v" + version)
+		fmt.Println(fmt.Sprintf(
+			`gohoard v%s, licensed under the %s
+Read more about the project and report issues at %s`, version, license, repository))
 	},
 }
 
