@@ -66,7 +66,7 @@ func getPassword(filePath string) (string, error) {
 	}
 
 	password, _ := os.ReadFile(decryptedPath)
-	os.Remove(encryptedPath)
+	os.Remove(decryptedPath)
 
 	return string(password), nil
 }
