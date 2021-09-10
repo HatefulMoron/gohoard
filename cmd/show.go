@@ -23,9 +23,9 @@ import (
 
 // showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:        "show",
-	Short:      "Print a password from the stash",
-	Long:       "Print a password from the stash to the terminal.",
+	Use:        "show <name>",
+	Short:      "Print a password from the hoard",
+	Long:       "Print a password from the hoard to the terminal.",
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"print"},
 	Run: func(cmd *cobra.Command, args []string) {

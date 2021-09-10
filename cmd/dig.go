@@ -28,8 +28,8 @@ import (
 
 // digCmd represents the dig command
 var digCmd = &cobra.Command{
-	Use:        "dig",
-	Short:      "Copy a password from the password hoard",
+	Use:        "dig <name>",
+	Short:      "Copy a password from the password hoard to the clipboard",
 	Long:       "Copy a password from the password hoard to the clipboard.",
 	Args:       cobra.ExactArgs(1),
 	SuggestFor: []string{"copy", "get"},

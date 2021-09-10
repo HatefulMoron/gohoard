@@ -29,9 +29,9 @@ import (
 
 // stashCmd represents the stash command
 var stashCmd = &cobra.Command{
-	Use:        "stash",
-	Short:      "Put a password in the password hoard",
-	Long:       "Put a password in the password hoard.",
+	Use:        "stash <name ...>",
+	Short:      "Generate a new password and put it in the password hoard",
+	Long:       "Generate a new password and put it in the password hoard.",
 	Args:       cobra.MinimumNArgs(1),
 	SuggestFor: []string{"add", "new", "create"},
 	Run: func(cmd *cobra.Command, args []string) {
