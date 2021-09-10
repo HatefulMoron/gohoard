@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -143,6 +144,15 @@ func writeNewConfig() error {
 	if hoardPath != "" {
 		viper.Set("hoardpath", hoardPath)
 	}
+	// Does the directory for this file exist? If not, create it.
+	containingDir := filepath.Dir(userConfig.FilePath)
+	if _, err = os.Stat(containingDir); os.IsNotExist(err) {
+		err = os.MkdirAll(containingDir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Write the new config.
 	err = viper.WriteConfig()
 	if err != nil {
