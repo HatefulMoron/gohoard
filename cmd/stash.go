@@ -108,8 +108,14 @@ func stashPassword(password []byte, hoardPath string, overwrite bool) error {
 	// Encrypt the file.
 	err = encryptFile(decryptedPath)
 	if err != nil {
+		// If the file is unable to be encrypted, delete it.
+		err = os.Remove(decryptedPath)
+		if err != nil {
+			return err
+		}
 		return errors.New(fmt.Sprintf("failed to encrypt: %s", decryptedPath))
 	}
+	// Finally, delete the decrypted file.
 	err = os.Remove(decryptedPath)
 	if err != nil {
 		return err
