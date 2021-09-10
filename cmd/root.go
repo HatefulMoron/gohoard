@@ -77,6 +77,7 @@ func initConfig() {
 				fmt.Println(fmt.Sprintf("cannot write to file: %s", userConfig.FilePath))
 			}
 			writeNewConfig()
+			readConfig()
 		} else {
 			readConfig()
 		}
@@ -109,11 +110,19 @@ func writeNewConfig() {
 		os.Exit(1)
 	}
 
+	fmt.Print("gohoard directory [$HOME/.gohoard/]: ")
+	var hoardPath string
+	_, err = fmt.Scanln(&hoardPath)
+	if err == nil { }
+
 	// Create the user config.
 	userConfig.KeyId = keyId
 
 	// Set the variables.
 	viper.Set("keyid", keyId)
+	if hoardPath != "" {
+		viper.Set("hoardpath", hoardPath)
+	}
 
 	// Write the new config.
 	err = viper.WriteConfig()
