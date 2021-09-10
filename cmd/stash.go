@@ -62,7 +62,7 @@ var stashCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(stashCmd)
 
-	stashCmd.Flags().IntP("min-length", "l", 20, "minimum password length")
+	stashCmd.Flags().IntP("min-length", "l", 30, "minimum password length")
 	stashCmd.Flags().BoolP("no-digits", "d", false, "omit digits")
 	stashCmd.Flags().BoolP("no-symbols", "s", false, "omit symbols")
 	stashCmd.Flags().BoolP("no-capitals", "c", false, "omit capitals")
